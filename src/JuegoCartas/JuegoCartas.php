@@ -92,7 +92,7 @@ class JuegoCartas{
         return $ids;
     }*/
 
-    public function obtenerIdsCartasYNumeros( int $numeroCartas, int $numeroFotos ): array{
+/*    public function obtenerIdsCartasYNumeros( int $numeroCartas, int $numeroFotos ): array{
         $ids = [];
         $nums = [];
         while( count($ids) < ($numeroCartas*2) ){
@@ -102,6 +102,28 @@ class JuegoCartas{
                 $ids[$rndId] = $rndNum;
                 $nums[] = $rndNum;
             }
+        }
+        return $ids;
+    }*/
+
+
+    public function obtenerIdsCartasYNumeros( int $numeroCartas, int $numeroFotos ): array{
+        $nums = [];
+        $ids = [];
+        $i = 0;
+        while( $i < $numeroCartas ){
+            $rand = -1;
+            $id1 = -1;
+            $id2 = -1;
+            do{
+                $rand = random_int( 1, $numeroFotos );
+                $id1 = random_int( 1, 1000 );
+                $id2 = random_int( 1, 1000 );
+            } while( $nums[$rand] || $ids[$id1] || $ids[$id2] );
+            $nums[$rand] = true;
+            $ids[$id1] = $rand;
+            $ids[$id2] = $rand;
+            $i++;
         }
         return $ids;
     }
