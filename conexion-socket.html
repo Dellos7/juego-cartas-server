@@ -1,0 +1,78 @@
+<html>
+<body>
+    <form onsubmit="return nuevaPartida()" name="nueva-partida">
+        <div>
+            <label>ID partida:</label>
+            <input type="text" name="id_partida" value="12345">
+        </div>
+        <div>
+            <label>Nombre jugador:</label>
+            <input type="text" name="nombre_jugador">
+        </div>
+        <div>
+            <button type="submit">Nueva partida</button>
+        </div>
+    </form>
+    <form onsubmit="return unirmeAPartida()" name="unirme-a-partida">
+        <div>
+            <label>ID partida:</label>
+            <input type="text" name="id_partida" value="12345">
+        </div>
+        <div>
+            <label>Nombre jugador:</label>
+            <input type="text" name="nombre_jugador">
+        </div>
+        <div>
+            <button type="submit">Unirme a partida</button>
+        </div>
+    </form>
+    <div id="root"></div>
+    <script>
+        var conn = new WebSocket('ws://localhost:12345');
+        conn.onopen = function(e) {
+            console.log("Connection established!");
+            /*conn.send('id_partida=12345;tipo_mensaje=girar_carta');
+            conn.send('id_partida=12345;tipo_mensaje=crear_partida');
+            conn.send('id_partida=12345;tipo_mensaje=unirse_a_partida');*/
+        };
+        conn.onmessage = function(e) {
+            var nodo = document.createElement('p');
+            nodo.innerHTML = e.data;
+            document.getElementById('root').appendChild(nodo);
+        };
+
+        function nuevaPartida(){
+            var idPartida, nombreJugador;
+            var idPartidaEl = document.querySelector( 'form[name="nueva-partida"] input[name="id_partida"]' );
+            if( idPartidaEl ){
+                idPartida = idPartidaEl.value;
+            }
+            var idJugadorEl = document.querySelector( 'form[name="nueva-partida"] input[name="nombre_jugador"]' );
+            if( idJugadorEl ){
+                nombreJugador = idJugadorEl.value;
+            }
+            if( idPartida && nombreJugador ){
+                conn.send( `tipo_mensaje=crear_partida;id_partida=${idPartida};nombre_jugador=${nombreJugador}` );
+            }
+            return false;
+        }
+
+        function unirmeAPartida(){
+            var idPartida, nombreJugador;
+            var idPartidaEl = document.querySelector( 'form[name="unirme-a-partida"] input[name="id_partida"]' );
+            if( idPartidaEl ){
+                idPartida = idPartidaEl.value;
+            }
+            var idJugadorEl = document.querySelector( 'form[name="unirme-a-partida"] input[name="nombre_jugador"]' );
+            if( idJugadorEl ){
+                nombreJugador = idJugadorEl.value;
+            }
+            if( idPartida && nombreJugador ){
+                conn.send( `tipo_mensaje=unirse_a_partida;id_partida=${idPartida};nombre_jugador=${nombreJugador}` );
+            }
+            return false;
+        }
+
+    </script>
+</body>
+</html>
