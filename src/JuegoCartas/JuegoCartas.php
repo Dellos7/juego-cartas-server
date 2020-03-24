@@ -37,7 +37,7 @@ class JuegoCartas{
         } else if( $partida->jugador2 && !$partida->jugador1 ){
             $partida->jugador1 = $jugador; // Jugador se une como jugador 1
             $fnCallbackUnirse( $partida->jugador2, $partida->jugador1 ); // Enviaremos un mensaje al otro jugador
-            $fnCallbackComenzarJuego( $partida->jugador2, $partida->jugador1 );
+            $fnCallbackComenzarJuego( $partida->jugador2, $partida->jugador1, $partida );
         } else if( $partida->jugador1 && $partida->jugador2 ){
             //TODO: 2 jugadores ya en la partida, hacer algo
         } else{
