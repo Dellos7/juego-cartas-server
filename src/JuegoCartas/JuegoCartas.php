@@ -14,13 +14,14 @@ class JuegoCartas{
         $this->partidas = [];
     }
 
-    public function nuevaPartida( string $idPartida, Jugador $jugador ){
+    public function nuevaPartida( string $idPartida, Jugador $jugador, int $numeroCartas ){
         $existe = array_key_exists( $idPartida, $this->partidas );
         if( $existe ){
             throw new PartidaYaExisteException();
         }
         $partida = new Partida($idPartida);
         $partida->jugador1 = $jugador;
+        $partida->numeroCartas = $numeroCartas;
         $this->partidas[$idPartida] = $partida;
     }
 
@@ -32,7 +33,7 @@ class JuegoCartas{
         if( $partida->jugador1 && !$partida->jugador2 ){
             $partida->jugador2 = $jugador; // Jugador se une como jugador2
             $fnCallbackUnirse( $partida->jugador1, $partida->jugador2 ); // Enviaremos un mensaje al otro jugador
-            $fnCallbackComenzarJuego( $partida->jugador1, $partida->jugador2 );
+            $fnCallbackComenzarJuego( $partida->jugador1, $partida->jugador2, $partida );
         } else if( $partida->jugador2 && !$partida->jugador1 ){
             $partida->jugador1 = $jugador; // Jugador se une como jugador 1
             $fnCallbackUnirse( $partida->jugador2, $partida->jugador1 ); // Enviaremos un mensaje al otro jugador
@@ -119,7 +120,7 @@ class JuegoCartas{
                 $rand = random_int( 1, $numeroFotos );
                 $id1 = random_int( 1, 1000 );
                 $id2 = random_int( 1, 1000 );
-            } while( $nums[$rand] || $ids[$id1] || $ids[$id2] );
+            } while( $nums[$rand] || $ids[$id1] || $ids[$id2] || ($id1 === $id2) );
             $nums[$rand] = true;
             $ids[$id1] = $rand;
             $ids[$id2] = $rand;

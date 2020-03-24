@@ -10,6 +10,7 @@ use SocketServer\JuegoCartas\TipoMensajeCliente;
 use SocketServer\JuegoCartas\JuegoCartas;
 use SocketServer\JuegoCartas\Jugador;
 use SocketServer\JuegoCartas\Mensajes;
+use SocketServer\JuegoCartas\Partida;
 use SocketServer\JuegoCartas\TipoMensajeServidor;
 
 class JuegoCartasSocket implements MessageComponentInterface{
@@ -59,7 +60,9 @@ class JuegoCartasSocket implements MessageComponentInterface{
                 switch( $tipoMensaje ){
                     case TipoMensajeCliente::$CREAR_PARTIDA:
                         Logger::log( "CREAR PARTIDA!!" );
-                        $this->juegoCartas->nuevaPartida( $idPartida, $jugador );
+                        //TODO: obtener numero cartas del mensaje recibido
+                        $numCartas = $datosMensaje[DatoMensaje::$NUMERO_CARTAS];
+                        $this->juegoCartas->nuevaPartida( $idPartida, $jugador, $numCartas );
                         $this->enviarMensajePartidaCreada( $jugador, $idPartida );
                         break;
                     case TipoMensajeCliente::$UNIRSE_A_PARTIDA:
@@ -154,18 +157,23 @@ class JuegoCartasSocket implements MessageComponentInterface{
         $this->clients[$jugador->id]->send( $mensaje );
     }
 
-    public function callbackComenzarJuego( Jugador $jugador, Jugador $jugadorUnido ){
+    public function callbackComenzarJuego( Jugador $jugador, Jugador $jugadorUnido, Partida $partida ){
         $tipoMensaje = TipoMensajeServidor::$COMIENZA_JUEGO;
         $msgComienzaJuego = Mensajes::getMensajeComienzaJuego();
-        $idsCartasYNumerosStr = $this->juegoCartas->obtenerIdsCartasYNumerosStrMsg( self::$NUMERO_CARTAS, self::$NUMERO_FOTOS );
+        $idsCartasYNumerosStr = $this->juegoCartas->obtenerIdsCartasYNumerosStrMsg( $partida->numeroCartas, self::$NUMERO_FOTOS );
         $mensaje=
             DatoMensaje::$TIPO_MENSAJE . "={$tipoMensaje};" .
             DatoMensaje::$MENSAJE . "={$msgComienzaJuego};" .
-            DatoMensaje::$CARTAS . "={$idsCartasYNumerosStr};";
-        $mensajeJugador = $mensaje . DatoMensaje::$TURNO . "=1;"; // Jugador1 siempre comienza
+            DatoMensaje::$CARTAS . "={$idsCartasYNumerosStr};" .
+            DatoMensaje::$NUMERO_CARTAS . "={$partida->numeroCartas};";
+        $turnoJ1 = random_int(0, 1) > 0 ? "1" : "0";
+        $turnoJ2 = $turnoJ1 ? "0" : "1";
+        $mensajeJugador = $mensaje . DatoMensaje::$TURNO . "={$turnoJ1};";
         $mensajeJugador = $mensajeJugador . DatoMensaje::$NOMBRE_RIVAL . "=" . $jugadorUnido->nombre;
-        $mensajeJugadorUnido = $mensaje . DatoMensaje::$TURNO . "=0;"; // Jugador2 nunca comienza
+        $mensajeJugadorUnido = $mensaje . DatoMensaje::$TURNO . "={$turnoJ2};";
         $mensajeJugadorUnido = $mensajeJugadorUnido . DatoMensaje::$NOMBRE_RIVAL . "=" . $jugador->nombre;
+        echo $mensajeJugador . "\n";
+        echo $mensajeJugadorUnido . "\n";
         $this->clients[$jugador->id]->send( $mensajeJugador );
         $this->clients[$jugadorUnido->id]->send( $mensajeJugadorUnido );
     }
@@ -191,7 +199,6 @@ class JuegoCartasSocket implements MessageComponentInterface{
     }
 
     private static function procesarNumFotosYCartas( int $numCartas, int $numFotos ){
-        Logger::log( "num fotos: " . $numFotos . "\n" );
         if( $numCartas != self::$NUMERO_CARTAS ){
             self::$NUMERO_CARTAS = $numCartas;
         }
