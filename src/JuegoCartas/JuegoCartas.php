@@ -79,35 +79,6 @@ class JuegoCartas{
         return $this->partidas;
     }
 
-    /*public function obtenerIdsCartasYNumeros( int $numeroCartas ): array{
-        $ids = [];
-        $nums = [];
-        while( count($nums) < $numeroCartas ){
-            $rndId = random_int( 1, 1000 );
-            $rndNum = random_int( 1, $numeroCartas );
-            if( !$ids[$rndId] && !$nums[$rndNum] ){
-                $ids[$rndId] = $rndNum;
-                $nums[$rndNum] = $rndNum;
-            }
-        }
-        return $ids;
-    }*/
-
-/*    public function obtenerIdsCartasYNumeros( int $numeroCartas, int $numeroFotos ): array{
-        $ids = [];
-        $nums = [];
-        while( count($ids) < ($numeroCartas*2) ){
-            $rndId = random_int( 1, 1000 );
-            $rndNum = random_int( 1, $numeroFotos );
-            if( !$ids[$rndId] && $this->numVecesEnArr($rndNum, $nums) < 2 ){
-                $ids[$rndId] = $rndNum;
-                $nums[] = $rndNum;
-            }
-        }
-        return $ids;
-    }*/
-
-
     public function obtenerIdsCartasYNumeros( int $numeroCartas, int $numeroFotos ): array{
         $nums = [];
         $ids = [];
@@ -127,16 +98,6 @@ class JuegoCartas{
             $i++;
         }
         return $ids;
-    }
-
-    private function numVecesEnArr( $elem, $arr ): int{
-        $num = 0;
-        foreach( $arr as $e ){
-            if( $e == $elem ){
-                $num++;
-            }
-        }
-        return $num;
     }
 
     public function obtenerIdsCartasYNumerosStrMsg( int $numeroCartas, int $numeroFotos ): string{
